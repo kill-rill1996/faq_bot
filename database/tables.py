@@ -23,7 +23,7 @@ class SubGroup(Base):
     title = Column(String, unique=True, index=True, nullable=False)
 
     group_id = Column(Integer, ForeignKey('groups.id'))
-    group = relationship("Group", back_populates="subgroups", cascade="all,delete", lazy="dynamic")
+    group = relationship("Group", back_populates="subgroups", cascade="all,delete")
 
     questions = relationship("Question", back_populates="subgroup")
 
@@ -38,7 +38,7 @@ class Question(Base):
     title = Column(String, unique=True, index=True, nullable=False)
 
     subgroup_id = Column(Integer, ForeignKey('subgroups.id'))
-    subgroup = relationship("SubGroup", back_populates="questions", cascade="all,delete", lazy="dynamic")
+    subgroup = relationship("SubGroup", back_populates="questions", cascade="all,delete")
 
     answers = relationship("Answer", back_populates="question")
 
@@ -53,7 +53,7 @@ class Answer(Base):
     text = Column(Text, nullable=False)
 
     question_id = Column(Integer, ForeignKey('questions.id'))
-    question = relationship("Question", back_populates="answers", cascade="all,delete", lazy="dynamic")
+    question = relationship("Question", back_populates="answers", cascade="all,delete")
 
     def __repr__(self):
         return f'{self.id}. {self.question.title} {self.text}'

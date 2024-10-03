@@ -32,8 +32,12 @@ def select_subgroup_keyboard(subgroups: List[tables.SubGroup]) -> InlineKeyboard
 def select_question_keyboard(questions: List[tables.Question]) -> InlineKeyboardBuilder:
     """Создание клавиатуры для выбора вопроса"""
     keyboard = InlineKeyboardBuilder()
+
+    count = 1
     for q in questions:
-        keyboard.row(InlineKeyboardButton(text=f"{q.title}", callback_data=f"{q.id}"))
+        keyboard.row(InlineKeyboardButton(text=f"{count}", callback_data=f"{q.id}"))
+        count += 1
+    keyboard.adjust(3)
 
     keyboard.row(InlineKeyboardButton(text="<< Назад", callback_data=f"back_to-subgroup"))
     keyboard.row(InlineKeyboardButton(text="❌ Отмена", callback_data=f"cancel"))
@@ -65,8 +69,12 @@ def create_subgroup_keyboard(subgroups: List[tables.SubGroup]) -> InlineKeyboard
 def create_question_keyboard(questions: List[tables.Question]) -> InlineKeyboardBuilder:
     """Создание клавиатуры для создания вопроса"""
     keyboard = InlineKeyboardBuilder()
+
+    count = 1
     for q in questions:
-        keyboard.row(InlineKeyboardButton(text=f"{q.title}", callback_data=f"{q.id}"))
+        keyboard.row(InlineKeyboardButton(text=f"{count}", callback_data=f"{q.id}"))
+        count += 1
+    keyboard.adjust(3)
 
     keyboard.row(InlineKeyboardButton(text="❌ Отмена", callback_data=f"cancel"))
     return keyboard

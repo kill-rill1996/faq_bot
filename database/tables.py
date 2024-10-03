@@ -10,7 +10,7 @@ class Group(Base):
     id = Column(Integer, primary_key=True)
     title = Column(String, unique=True, index=True, nullable=False)
 
-    subgroups = relationship("SubGroup", back_populates="group")
+    subgroups = relationship("SubGroup", back_populates="group", cascade="all,delete")
 
     def __repr__(self):
         return f'{self.id}. {self.title}'
@@ -23,7 +23,7 @@ class SubGroup(Base):
     title = Column(String, unique=True, index=True, nullable=False)
 
     group_id = Column(Integer, ForeignKey('groups.id'))
-    group = relationship("Group", back_populates="subgroups", cascade="all,delete")
+    group = relationship("Group", back_populates="subgroups")
 
     questions = relationship("Question", back_populates="subgroup")
 

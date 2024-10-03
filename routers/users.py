@@ -6,6 +6,7 @@ from aiogram.fsm.context import FSMContext
 import keyboards as kb
 import database.services as db
 from fsm_states import ChooseAnswerFSM
+import messages as ms
 
 router = Router()
 
@@ -67,8 +68,8 @@ async def choose_question_handler(callback: types.CallbackQuery, state: FSMConte
     questions = db.get_all_questions_by_subgroup_id(subgroup_id=subgroup_id)
 
     await state.set_state(ChooseAnswerFSM.question)
-    await callback.message.edit_text("Выберите вопрос...",
-                                     reply_markup=kb.select_question_keyboard(questions).as_markup())
+    message = ms.get_questions(questions)
+    await callback.message.edit_text(message, reply_markup=kb.select_question_keyboard(questions).as_markup())
 
 
 @router.callback_query(ChooseAnswerFSM.question, lambda callback: callback.data != "cancel")

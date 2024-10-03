@@ -9,6 +9,7 @@ from middleware import CheckIsAdminMiddleware
 from fsm_states import CreateAnswerFSM
 import keyboards as kb
 import database.services as db
+import messages as ms
 
 router = Router()
 router.message.middleware.register(CheckIsAdminMiddleware(ADMINS))
@@ -48,8 +49,9 @@ async def create_subgroup(message: types.CallbackQuery | types.Message, state: F
     # новая группа
     else:
         group_title = message.text
-        # group_id = db.create_group(message.text)
-        await state.update_data(group_title=group_title)
+        group_id = db.create_group(message.text)
+        # await state.update_data(group_title=group_title)
+        await state.update_data(group_id=group_id)
 
         await state.set_state(CreateAnswerFSM.subgroup)
 
@@ -75,10 +77,9 @@ async def create_question(message: types.CallbackQuery | types.Message, state: F
         await state.set_state(CreateAnswerFSM.question)
 
         questions = db.get_all_questions_by_subgroup_id(subgroup_id)
+        mess = ms.get_questions(questions, creation=True)
 
-        await message.message.edit_text(
-            "Выберите вопрос или отправьте вопрос текстом, чтобы создать новый",
-            reply_markup=kb.create_question_keyboard(questions).as_markup())
+        await message.message.edit_text(mess, reply_markup=kb.create_question_keyboard(questions).as_markup())
 
     # новая подгруппа
     else:
@@ -95,7 +96,7 @@ async def create_question(message: types.CallbackQuery | types.Message, state: F
         except TelegramBadRequest:
             pass
 
-        msg = await message.answer("Введите вопрос", reply_markup=kb.cancel_keyboard().as_markup())
+        msg = await message.answer("Отправьте вопрос текстом", reply_markup=kb.cancel_keyboard().as_markup())
         await state.update_data(prev_mess=msg)
 
 

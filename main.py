@@ -6,6 +6,7 @@ from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.types import BotCommand, BotCommandScopeDefault
 
 from config import BOT_TOKEN
+from database.services import create_fake_data
 from routers import admin, users
 from database import database
 
@@ -13,6 +14,7 @@ from database import database
 async def set_commands(bot: io.Bot):
     """Перечень команд для бота"""
     commands = [
+        BotCommand(command="answers", description="Найти ответ"),
         BotCommand(command="add_answer", description="Добавить вопрос/ответ"),
     ]
 
@@ -40,4 +42,5 @@ async def start_bot() -> None:
 if __name__ == "__main__":
     print("Запуск бота...")
     database.create_db()
+    # create_fake_data()
     asyncio.run(start_bot())

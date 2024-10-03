@@ -81,7 +81,13 @@ async def answer_handler(callback: types.CallbackQuery, state: FSMContext) -> No
     data = await state.get_data()
     await state.clear()
 
+    question = db.get_question_by_id(data["question_id"])
     answers = db.get_all_answers_by_question_id(question_id=data["question_id"])
+
+    # вывести вопрос
+    await callback.message.answer(f"<b>{question.title}</b>")
+
+    # ответы
     for a in answers:
         await callback.message.answer(a.text)
 

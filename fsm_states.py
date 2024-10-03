@@ -12,5 +12,6 @@ class ChooseAnswerFSM(StatesGroup):
     group = State()
     subgroup = State()
     question = State()
+    answers = State()
 
 

@@ -79,6 +79,13 @@ def get_all_answers_by_question_id(question_id: int) -> List[tables.Answer]:
         return answers
 
 
+def get_question_by_id(question_id: int) -> tables.Question:
+    """Получение вопроса по его id"""
+    with Session() as session:
+        question = session.query(tables.Question).filter(tables.Question.id == question_id).first()
+        return question
+
+
 def create_fake_data():
     # Groups
     create_group(title="Арбитражный суд")

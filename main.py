@@ -18,6 +18,7 @@ async def set_commands(bot: io.Bot):
         BotCommand(command="add_group", description="Добавить группу"),
         BotCommand(command="add_subgroup", description="Добавить подгруппу"),
         BotCommand(command="add_question", description="Добавить вопрос"),
+        BotCommand(command="add_answer", description="Добавить ответ"),
     ]
 
     await bot.set_my_commands(commands, BotCommandScopeDefault())

@@ -21,3 +21,15 @@ def get_questions(questions: list[tables.Question], creation: bool = False) -> s
 
     return result
 
+
+def get_questions_text(questions: list[tables.Question]) -> str:
+    """Список вопросов для отдельного создания вопросов"""
+    result = "Выберите <b>номер</b> вопроса из списка:\n\n"
+
+    count = 1
+    for quest in questions:
+        result += f"<b>{count}.</b> {quest.title}\n"
+        count += 1
+
+    return result
+

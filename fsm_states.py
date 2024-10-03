@@ -1,7 +1,7 @@
 from aiogram.fsm.state import StatesGroup, State
 
 
-class CreateAnswerFSM(StatesGroup):
+class CreateAnswerFullFSM(StatesGroup):
     group = State()
     subgroup = State()
     question = State()
@@ -27,3 +27,10 @@ class CreateQuestionFSM(StatesGroup):
     choose_group = State()
     choose_subgroup = State()
     title = State()
+
+
+class CreateAnswerFSM(StatesGroup):
+    choose_group = State()
+    choose_subgroup = State()
+    choose_answer = State()
+    text = State()

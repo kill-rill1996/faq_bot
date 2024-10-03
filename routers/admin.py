@@ -6,7 +6,7 @@ from aiogram.fsm.context import FSMContext
 
 from config import ADMINS
 from middleware import CheckIsAdminMiddleware
-from fsm_states import CreateAnswerFSM
+from fsm_states import CreateAnswerFullFSM
 import keyboards as kb
 import database.services as db
 import messages as ms
@@ -17,8 +17,8 @@ router.message.middleware.register(CheckIsAdminMiddleware(ADMINS))
 
 @router.message(Command("add_answer"))
 async def create_group(message: types.Message, state: FSMContext) -> None:
-    """Выбор группы, начало CreateAnswerFSM"""
-    await state.set_state(CreateAnswerFSM.group)
+    """Выбор группы, начало CreateAnswerFullFSM"""
+    await state.set_state(CreateAnswerFullFSM.group)
 
     groups = db.get_all_groups()
 
@@ -28,8 +28,8 @@ async def create_group(message: types.Message, state: FSMContext) -> None:
     await state.update_data(prev_mess=msg)
 
 
-@router.callback_query(CreateAnswerFSM.group)
-@router.message(CreateAnswerFSM.group)
+@router.callback_query(CreateAnswerFullFSM.group)
+@router.message(CreateAnswerFullFSM.group)
 async def create_subgroup(message: types.CallbackQuery | types.Message, state: FSMContext) -> None:
     """Выбор подгруппы, запись группы FSM storage"""
     # имеющаяся группа
@@ -37,7 +37,7 @@ async def create_subgroup(message: types.CallbackQuery | types.Message, state: F
         group_id = int(message.data)
         await state.update_data(group_id=group_id)
 
-        await state.set_state(CreateAnswerFSM.subgroup)
+        await state.set_state(CreateAnswerFullFSM.subgroup)
 
         subgroups = db.get_all_subgroups_by_group_id(group_id)
 
@@ -56,7 +56,7 @@ async def create_subgroup(message: types.CallbackQuery | types.Message, state: F
         await state.update_data(group_title=group_title)
         # await state.update_data(group_id=group_id)
 
-        await state.set_state(CreateAnswerFSM.subgroup)
+        await state.set_state(CreateAnswerFullFSM.subgroup)
 
         try:
             data = await state.get_data()
@@ -68,8 +68,8 @@ async def create_subgroup(message: types.CallbackQuery | types.Message, state: F
         await state.update_data(prev_mess=msg)
 
 
-@router.callback_query(CreateAnswerFSM.subgroup)
-@router.message(CreateAnswerFSM.subgroup)
+@router.callback_query(CreateAnswerFullFSM.subgroup)
+@router.message(CreateAnswerFullFSM.subgroup)
 async def create_question(message: types.CallbackQuery | types.Message, state: FSMContext) -> None:
     """Выбор вопроса, запись подгруппы FSM storage"""
     # имеющаяся подгруппа
@@ -77,7 +77,7 @@ async def create_question(message: types.CallbackQuery | types.Message, state: F
         subgroup_id = int(message.data)
         await state.update_data(subgroup_id=subgroup_id)
 
-        await state.set_state(CreateAnswerFSM.question)
+        await state.set_state(CreateAnswerFullFSM.question)
 
         questions = db.get_all_questions_by_subgroup_id(subgroup_id)
         mess = ms.get_questions(questions, creation=True)
@@ -91,7 +91,7 @@ async def create_question(message: types.CallbackQuery | types.Message, state: F
         subgroup_id = db.create_subgroup(message.text, group_id)
         await state.update_data(subgroup_id=subgroup_id)
 
-        await state.set_state(CreateAnswerFSM.question)
+        await state.set_state(CreateAnswerFullFSM.question)
 
         try:
             data = await state.get_data()
@@ -103,8 +103,8 @@ async def create_question(message: types.CallbackQuery | types.Message, state: F
         await state.update_data(prev_mess=msg)
 
 
-@router.callback_query(CreateAnswerFSM.question)
-@router.message(CreateAnswerFSM.question)
+@router.callback_query(CreateAnswerFullFSM.question)
+@router.message(CreateAnswerFullFSM.question)
 async def create_answer(message: types.CallbackQuery | types.Message, state: FSMContext) -> None:
     """Создание ответа, вопроса FSM storage"""
     # имеющийся вопрос
@@ -112,7 +112,7 @@ async def create_answer(message: types.CallbackQuery | types.Message, state: FSM
         question_id = int(message.data)
         await state.update_data(question_id=question_id)
 
-        await state.set_state(CreateAnswerFSM.answer)
+        await state.set_state(CreateAnswerFullFSM.answer)
         await message.message.edit_text("Введите ответ", reply_markup=kb.cancel_keyboard().as_markup())
 
     # новый вопрос
@@ -122,7 +122,7 @@ async def create_answer(message: types.CallbackQuery | types.Message, state: FSM
         question_id = db.create_question(message.text, subgroup_id)
         await state.update_data(question_id=question_id)
 
-        await state.set_state(CreateAnswerFSM.answer)
+        await state.set_state(CreateAnswerFullFSM.answer)
 
         try:
             data = await state.get_data()
@@ -134,9 +134,9 @@ async def create_answer(message: types.CallbackQuery | types.Message, state: FSM
         await state.update_data(prev_mess=msg)
 
 
-@router.message(CreateAnswerFSM.answer)
+@router.message(CreateAnswerFullFSM.answer)
 async def create_answer_finish(message: types.Message, state: FSMContext) -> None:
-    """Запись вопроса в бд, окончание CreateAnswerFSM"""
+    """Запись вопроса в бд, окончание CreateAnswerFullFSM"""
     answer_text = message.text
     data = await state.get_data()
     question_id = data["question_id"]

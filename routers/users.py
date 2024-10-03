@@ -14,7 +14,7 @@ router = Router()
 async def start_handler(message: types.Message) -> None:
     """Start message"""
     await message.answer("Бот поможет вам найти ответ на вопрос по интересующей вас теме.\n\n"
-                         "Для поиска ответа выберите команду /answers во вкладке \"Меню\" или нажмите на команду прямо в сообщении.")
+                         "Для поиска ответа выберите команду\n/answers во вкладке \"Меню\" или нажмите на команду прямо в сообщении.")
 
 
 @router.message(Command("answers"))
@@ -30,11 +30,11 @@ async def start_handler(message: types.Message | types.CallbackQuery, state: FSM
 
     # при возвращении назад
     if type(message) == types.CallbackQuery:
-        await message.message.edit_text("Выберите группу", reply_markup=kb.select_group_keyboard(groups).as_markup())
+        await message.message.edit_text("Выберите группу...", reply_markup=kb.select_group_keyboard(groups).as_markup())
 
     # при прямом выборе
     else:
-        await message.answer("Выберите группу", reply_markup=kb.select_group_keyboard(groups).as_markup())
+        await message.answer("Выберите группу...", reply_markup=kb.select_group_keyboard(groups).as_markup())
 
 
 @router.callback_query(ChooseAnswerFSM.group, lambda callback: callback.data != "cancel")
@@ -54,7 +54,7 @@ async def choose_subgroup_handler(callback: types.CallbackQuery, state: FSMConte
     subgroups = db.get_all_subgroups_by_group_id(group_id=group_id)
 
     await state.set_state(ChooseAnswerFSM.subgroup)
-    await callback.message.edit_text("Выберите подгруппу",
+    await callback.message.edit_text("Выберите подгруппу...",
                                      reply_markup=kb.select_subgroup_keyboard(subgroups).as_markup())
 
 
@@ -67,7 +67,7 @@ async def choose_question_handler(callback: types.CallbackQuery, state: FSMConte
     questions = db.get_all_questions_by_subgroup_id(subgroup_id=subgroup_id)
 
     await state.set_state(ChooseAnswerFSM.question)
-    await callback.message.edit_text("Выберите вопрос",
+    await callback.message.edit_text("Выберите вопрос...",
                                      reply_markup=kb.select_question_keyboard(questions).as_markup())
 
 

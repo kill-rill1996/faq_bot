@@ -7,28 +7,31 @@ from database import tables
 from .database import Session
 
 
-def create_group(title: str) -> None:
+def create_group(title: str) -> int:
     """Создание группы"""
     with Session() as session:
         group = tables.Group(title=title)
         session.add(group)
         session.commit()
+        return group.id
 
 
-def create_subgroup(title: str, group_id: int) -> None:
+def create_subgroup(title: str, group_id: int) -> int:
     """Создание подгруппы по id группы"""
     with Session() as session:
         subgroup = tables.SubGroup(title=title, group_id=group_id)
         session.add(subgroup)
         session.commit()
+        return subgroup.id
 
 
-def create_question(title: str, subgroup_id: int) -> None:
+def create_question(title: str, subgroup_id: int) -> int:
     """Создание вопроса по id подгруппы"""
     with Session() as session:
         question = tables.Question(title=title, subgroup_id=subgroup_id)
         session.add(question)
         session.commit()
+        return question.id
 
 
 def create_answer(text: str, question_id: int) -> None:

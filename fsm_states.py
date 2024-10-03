@@ -5,6 +5,7 @@ class CreateAnswerFSM(StatesGroup):
     group = State()
     subgroup = State()
     question = State()
+    answer = State()
 
 
 class ChooseAnswerFSM(StatesGroup):

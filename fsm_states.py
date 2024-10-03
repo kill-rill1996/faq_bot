@@ -12,6 +12,18 @@ class ChooseAnswerFSM(StatesGroup):
     group = State()
     subgroup = State()
     question = State()
-    answers = State()
 
 
+class CreateGroupFSM(StatesGroup):
+    title = State()
+
+
+class CreateSubGroupFSM(StatesGroup):
+    choose_group = State()
+    title = State()
+
+
+class CreateQuestionFSM(StatesGroup):
+    choose_group = State()
+    choose_subgroup = State()
+    title = State()

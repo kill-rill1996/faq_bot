@@ -49,9 +49,12 @@ async def create_subgroup(message: types.CallbackQuery | types.Message, state: F
     # новая группа
     else:
         group_title = message.text
-        group_id = db.create_group(message.text)
-        # await state.update_data(group_title=group_title)
-        await state.update_data(group_id=group_id)
+
+
+        # group_id = db.create_group(message.text)
+
+        await state.update_data(group_title=group_title)
+        # await state.update_data(group_id=group_id)
 
         await state.set_state(CreateAnswerFSM.subgroup)
 

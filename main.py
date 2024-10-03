@@ -7,7 +7,7 @@ from aiogram.types import BotCommand, BotCommandScopeDefault
 
 from config import BOT_TOKEN
 from database.services import create_fake_data
-from routers import admin, users
+from routers import admin, users, new_admin
 from database import database
 
 
@@ -15,7 +15,9 @@ async def set_commands(bot: io.Bot):
     """Перечень команд для бота"""
     commands = [
         BotCommand(command="answers", description="Найти ответ"),
-        BotCommand(command="add_answer", description="Добавить вопрос/ответ"),
+        BotCommand(command="add_group", description="Добавить группу"),
+        BotCommand(command="add_subgroup", description="Добавить подгруппу"),
+        BotCommand(command="add_question", description="Добавить вопрос"),
     ]
 
     await bot.set_my_commands(commands, BotCommandScopeDefault())
@@ -34,7 +36,7 @@ async def start_bot() -> None:
     #                   minute=0, second=0, start_date=datetime.now(), kwargs={"bot": bot})
     # scheduler.start()
 
-    dispatcher.include_routers(users.router, admin.router)
+    dispatcher.include_routers(users.router, new_admin.router)
 
     await dispatcher.start_polling(bot)
 

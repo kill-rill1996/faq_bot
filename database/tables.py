@@ -20,7 +20,7 @@ class SubGroup(Base):
     __tablename__ = 'subgroups'
 
     id = Column(Integer, primary_key=True)
-    title = Column(String, unique=True, index=True, nullable=False)
+    title = Column(String, index=True, nullable=False)
 
     group_id = Column(Integer, ForeignKey('groups.id'))
     group = relationship("Group", back_populates="subgroups")

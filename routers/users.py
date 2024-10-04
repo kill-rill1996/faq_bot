@@ -1,4 +1,4 @@
-from aiogram import Router, types
+from aiogram import Router, types, F
 from aiogram.exceptions import TelegramBadRequest
 from aiogram.filters import Command, StateFilter
 from aiogram.fsm.context import FSMContext
@@ -9,6 +9,11 @@ from fsm_states import ChooseAnswerFSM
 import messages as ms
 
 router = Router()
+
+
+@router.message(~F.content_type.in_({'text'}), StateFilter("*"))
+async def block_types_handler(message: types.Message) -> None:
+    await message.answer("Некорректный тип данных в сообщении (принимается только текст)")
 
 
 @router.message(Command("start"))

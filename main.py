@@ -7,7 +7,7 @@ from aiogram.types import BotCommand, BotCommandScopeDefault
 
 from config import BOT_TOKEN
 from database.services import create_fake_data
-from routers import admin, users, new_admin
+from routers import admin, users
 from database import database
 
 
@@ -37,7 +37,7 @@ async def start_bot() -> None:
     #                   minute=0, second=0, start_date=datetime.now(), kwargs={"bot": bot})
     # scheduler.start()
 
-    dispatcher.include_routers(users.router, new_admin.router)
+    dispatcher.include_routers(users.router, admin.router)
 
     await dispatcher.start_polling(bot)
 

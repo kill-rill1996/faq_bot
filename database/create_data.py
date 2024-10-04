@@ -55,3 +55,7 @@ def create_fake_data():
     create_answer(text="Стандарты создания таблиц для учета мат. ценностей в юридических организациях № 3...", question_id=12)
 
     print("Тестовые данные созданы!")
+
+
+if __name__ == "__main__":
+    create_fake_data()

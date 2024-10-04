@@ -6,7 +6,6 @@ from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.types import BotCommand, BotCommandScopeDefault
 
 from config import BOT_TOKEN
-from database.services import create_fake_data
 from routers import admin, users
 from database import database
 
@@ -45,5 +44,4 @@ async def start_bot() -> None:
 if __name__ == "__main__":
     print("Запуск бота...")
     database.create_db()
-    # create_fake_data()
     asyncio.run(start_bot())

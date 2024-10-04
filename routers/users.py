@@ -32,6 +32,7 @@ async def start_handler(message: types.Message | types.CallbackQuery, state: FSM
         await state.clear()
 
     groups = db.get_all_groups()
+
     await state.set_state(ChooseAnswerFSM.group)
 
     # при возвращении назад
@@ -60,19 +61,41 @@ async def choose_subgroup_handler(callback: types.CallbackQuery, state: FSMConte
     subgroups = db.get_all_subgroups_by_group_id(group_id=group_id)
 
     await state.set_state(ChooseAnswerFSM.subgroup)
+
+    # если группа пустая
+    if not subgroups:
+        await callback.message.edit_text("В данной группе вопросов пока нет",
+                                         reply_markup=kb.select_subgroup_keyboard(subgroups).as_markup())
+        return
+
     await callback.message.edit_text("Выберите подгруппу...",
                                      reply_markup=kb.select_subgroup_keyboard(subgroups).as_markup())
 
 
 @router.callback_query(ChooseAnswerFSM.subgroup, lambda callback: callback.data != "cancel")
+@router.callback_query(lambda callback: callback.data.split("_")[0] == "back" and callback.data.split("_")[1] == "to-question")
 async def choose_question_handler(callback: types.CallbackQuery, state: FSMContext) -> None:
     """Выбор вопроса, запись подгруппы в FSM storage"""
-    subgroup_id = int(callback.data)
+    # при возвращении назад
+    if "_" in callback.data:
+        data = await state.get_data()
+        subgroup_id = data["subgroup_id"]
+    # при прямом выборе
+    else:
+        subgroup_id = int(callback.data)
+
     await state.update_data(subgroup_id=subgroup_id)
 
     questions = db.get_all_questions_by_subgroup_id(subgroup_id=subgroup_id)
 
     await state.set_state(ChooseAnswerFSM.question)
+
+    # если подгруппа пустая
+    if not questions:
+        await callback.message.edit_text("В данной подгруппе вопросов пока нет",
+                                         reply_markup=kb.select_question_keyboard(questions).as_markup())
+        return
+
     message = ms.get_questions(questions)
     await callback.message.edit_text(message, reply_markup=kb.select_question_keyboard(questions).as_markup())
 
@@ -84,10 +107,17 @@ async def answer_handler(callback: types.CallbackQuery, state: FSMContext) -> No
     await state.update_data(question_id=question_id)
 
     data = await state.get_data()
-    await state.clear()
 
     question = db.get_question_by_id(data["question_id"])
     answers = db.get_all_answers_by_question_id(question_id=data["question_id"])
+
+    # если вопрос пустой без ответов
+    if not answers:
+        await callback.message.edit_text("На данный вопросов ответов пока нет",
+                                         reply_markup=kb.back_to_question_keyboard().as_markup())
+        return
+
+    await state.clear()
 
     # вывести вопрос
     await callback.message.answer(f"<b>{question.title}</b>")

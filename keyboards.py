@@ -44,6 +44,15 @@ def select_question_keyboard(questions: List[tables.Question]) -> InlineKeyboard
     return keyboard
 
 
+def back_to_question_keyboard() -> InlineKeyboardBuilder:
+    """Создание клавиатуры для возвращения назад от пустого вопроса"""
+    keyboard = InlineKeyboardBuilder()
+
+    keyboard.row(InlineKeyboardButton(text="<< Назад", callback_data=f"back_to-question"))
+    keyboard.row(InlineKeyboardButton(text="❌ Отмена", callback_data=f"cancel"))
+    return keyboard
+
+
 def create_group_keyboard(groups: List[tables.Group]) -> InlineKeyboardBuilder:
     """Создание клавиатуры для создания группы"""
     keyboard = InlineKeyboardBuilder()

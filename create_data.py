@@ -57,5 +57,4 @@ def create_fake_data():
     print("Тестовые данные созданы!")
 
 
-if __name__ == "__main__":
-    create_fake_data()
+create_fake_data()

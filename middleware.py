@@ -2,19 +2,16 @@ from typing import Callable, Dict, Any, Awaitable, List
 
 from aiogram import BaseMiddleware
 from aiogram.types import TelegramObject
-from database import database as db
 from database.services import get_all_admins
 
 
 class CheckIsAdminMiddleware(BaseMiddleware):
     """Проверка является ли пользователь админом"""
     def __init__(self, env_admins: List[str]):
-        db.create_db()
-        db_admins = [admin.tg_id for admin in get_all_admins()]
-        self.admins = list(set(env_admins + db_admins))
+        self.admins = env_admins
 
     def is_admin(self, tg_id) -> bool:
-        if str(tg_id) not in self.admins:
+        if str(tg_id) not in [admin.tg_id for admin in get_all_admins()] + self.admins:
             return False
         return True
 
@@ -33,3 +30,18 @@ class CheckIsAdminMiddleware(BaseMiddleware):
             show_alert=True
         )
         return
+
+
+class CheckPrivateMessageMiddleware(BaseMiddleware):
+    """Проверка сообщения в лс, а не группу"""
+    async def __call__(self,
+            handler: Callable[[TelegramObject, Dict[str, Any]], Awaitable[Any]],
+            event: TelegramObject,
+            data: Dict[str, Any]) -> Any:
+
+        # проверяем является ли пользователь админом
+        if data["event_chat"].type == "private":
+            return await handler(event, data)
+        return
+
+

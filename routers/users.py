@@ -7,8 +7,10 @@ import keyboards as kb
 import database.services as db
 from fsm_states import ChooseAnswerFSM
 import messages as ms
+from middleware import CheckPrivateMessageMiddleware
 
 router = Router()
+router.message.middleware.register(CheckPrivateMessageMiddleware())
 
 
 @router.message(~F.content_type.in_({'text'}), StateFilter("*"))

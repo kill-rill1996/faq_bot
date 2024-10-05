@@ -4,7 +4,7 @@ from aiogram.filters import Command, StateFilter
 from aiogram.fsm.context import FSMContext
 
 from config import ADMINS
-from middleware import CheckIsAdminMiddleware
+from middleware import CheckIsAdminMiddleware, CheckPrivateMessageMiddleware
 from fsm_states import CreateGroupFSM, CreateSubGroupFSM, CreateQuestionFSM, CreateAnswerFSM, CreateAdminFSM
 import keyboards as kb
 import routers.utils as utils
@@ -12,17 +12,17 @@ import database.services as db
 import messages as ms
 
 router = Router()
-admin_middleware = CheckIsAdminMiddleware(ADMINS)
-router.message.middleware.register(admin_middleware)
-# router.message.middleware.register(CheckIsAdminMiddleware(ADMINS))
+router.message.middleware.register(CheckPrivateMessageMiddleware())
+router.message.middleware.register(CheckIsAdminMiddleware(ADMINS))
 
 
+# ADD ADMIN
 @router.message(Command("add_admin"))
 async def add_admin(message: types.Message, state: FSMContext) -> None:
     """Добавление админа, начало FSM"""
     await state.set_state(CreateAdminFSM.contact)
-    msg = await message.answer("Отправьте контакт нового администратора через вкладку 'Прикрепить'",
-                         reply_markup=kb.cancel_keyboard().as_markup())
+    msg = await message.answer("Отправьте карточку контакта нового администратора через вкладку 'Прикрепить'",
+                               reply_markup=kb.cancel_keyboard().as_markup())
     await state.update_data(prev_mess=msg)
 
 
@@ -42,12 +42,10 @@ async def save_admin(message: types.Message, state: FSMContext) -> None:
         msg = await message.answer("Пользователь уже является администратором, отправьте другой контакт",
                                    reply_markup=kb.cancel_keyboard().as_markup())
         await state.update_data(prev_mess=msg)
-        return
 
     # новый админ
     else:
         db.create_admin(tg_id=tg_id)
-        admin_middleware.admins += tg_id
 
         data = await state.get_data()
         try:
@@ -56,7 +54,7 @@ async def save_admin(message: types.Message, state: FSMContext) -> None:
             pass
         await state.clear()
 
-        await message.answer("Новый администратор успешно добавлен!")
+        await message.answer("Новый администратор успешно добавлен ✅")
 
 
 # BLOCK OTHER TYPES
@@ -108,7 +106,7 @@ async def create_subgroup(message: types.Message, state: FSMContext) -> None:
     await state.update_data(prev_mess=msg)
 
 
-@router.callback_query(CreateSubGroupFSM.choose_group)
+@router.callback_query(CreateSubGroupFSM.choose_group, lambda callback: callback.data != "cancel")
 async def choose_group(callback: types.CallbackQuery, state: FSMContext) -> None:
     group_id = int(callback.data)
     await state.update_data(group_id=group_id)
@@ -158,7 +156,7 @@ async def create_question(message: types.Message, state: FSMContext) -> None:
     await state.update_data(prev_mess=msg)
 
 
-@router.callback_query(CreateQuestionFSM.choose_group)
+@router.callback_query(CreateQuestionFSM.choose_group, lambda callback: callback.data != "cancel")
 async def choose_group_q(callback: types.CallbackQuery, state: FSMContext) -> None:
     group_id = int(callback.data)
     await state.update_data(group_id=group_id)
@@ -170,7 +168,7 @@ async def choose_group_q(callback: types.CallbackQuery, state: FSMContext) -> No
                                reply_markup=kb.create_subgroup_keyboard(all_groups).as_markup())
 
 
-@router.callback_query(CreateQuestionFSM.choose_subgroup)
+@router.callback_query(CreateQuestionFSM.choose_subgroup, lambda callback: callback.data != "cancel")
 async def choose_subgroup_q(callback: types.CallbackQuery, state: FSMContext) -> None:
     subgroup_id = int(callback.data)
     await state.update_data(subgroup_id=subgroup_id)
@@ -219,7 +217,7 @@ async def create_answer(message: types.Message, state: FSMContext) -> None:
     await state.update_data(prev_mess=msg)
 
 
-@router.callback_query(CreateAnswerFSM.choose_group)
+@router.callback_query(CreateAnswerFSM.choose_group, lambda callback: callback.data != "cancel")
 async def choose_group_a(callback: types.CallbackQuery, state: FSMContext) -> None:
     group_id = int(callback.data)
     await state.update_data(group_id=group_id)
@@ -231,7 +229,7 @@ async def choose_group_a(callback: types.CallbackQuery, state: FSMContext) -> No
                                reply_markup=kb.create_subgroup_keyboard(all_groups).as_markup())
 
 
-@router.callback_query(CreateAnswerFSM.choose_subgroup)
+@router.callback_query(CreateAnswerFSM.choose_subgroup, lambda callback: callback.data != "cancel")
 async def choose_subgroup_a(callback: types.CallbackQuery, state: FSMContext) -> None:
     subgroup_id = int(callback.data)
     await state.update_data(subgroup_id=subgroup_id)
@@ -243,7 +241,7 @@ async def choose_subgroup_a(callback: types.CallbackQuery, state: FSMContext) ->
     await callback.message.edit_text(questions_text, reply_markup=kb.create_question_keyboard(all_questions).as_markup())
 
 
-@router.callback_query(CreateAnswerFSM.choose_answer)
+@router.callback_query(CreateAnswerFSM.choose_answer, lambda callback: callback.data != "cancel")
 async def choose_subgroup_q(callback: types.CallbackQuery, state: FSMContext) -> None:
     question_id = int(callback.data)
     await state.update_data(question_id=question_id)
@@ -268,6 +266,7 @@ async def save_answer(message: types.Message, state: FSMContext) -> None:
     await message.answer(f'Ответ создан! ✅')
 
 
+# CANCEL BUTTON
 @router.callback_query(lambda callback: callback.data == "cancel", StateFilter("*"))
 async def cancel_handler(callback: types.CallbackQuery, state: FSMContext):
     """Cancel FSM and delete last message"""
@@ -277,3 +276,4 @@ async def cancel_handler(callback: types.CallbackQuery, state: FSMContext):
         await callback.message.delete()
     except TelegramBadRequest:
         pass
+

@@ -1,19 +1,11 @@
 from aiogram import Bot
-from config import ADMINS
+from config import GROUP_ID
 
 
-async def send_balance_report(bot: Bot):
-    """Получение баланса раз в день"""
-    msg = "⚠️ <i>Ежедневный отчет:</i>\n\n"
+async def send_notification(bot: Bot):
+    """Уведомление о боте в группу"""
+    msg = " ❗<i>Напоминание:</i>\n\n" \
+          "Для поиска ответов на вопросы вы можете воспользоваться нашим телеграм ботом @FAQQQTestBot\n\n" \
+          "<b>Важно:</b> бот отвечает только в личных сообщениях"
 
-    balance_info = gs.get_all_info_from_balance()
-    if not balance_info:
-        msg += "Данные отсутствуют"
-        await bot.send_message(ADMINS[0], msg)
-        return
-
-    for row in balance_info:
-        msg += f"<b>{row[0]}.</b> Тг ID: {row[1]} пользователь <b>{row[2]}</b> сумма: <b>{row[3]}</b> руб. \n"
-
-    for admin in ADMINS:
-        await bot.send_message(admin, msg)
+    await bot.send_message(GROUP_ID, msg)

@@ -1,13 +1,6 @@
 from aiogram.fsm.state import StatesGroup, State
 
 
-class CreateAnswerFullFSM(StatesGroup):
-    group = State()
-    subgroup = State()
-    question = State()
-    answer = State()
-
-
 class ChooseAnswerFSM(StatesGroup):
     group = State()
     subgroup = State()

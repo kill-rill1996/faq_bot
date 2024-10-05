@@ -3,15 +3,17 @@ from typing import Callable, Dict, Any, Awaitable, List
 from aiogram import BaseMiddleware
 from aiogram.types import TelegramObject
 import config
+from database.services import get_all_admins
 
 
 class CheckIsAdminMiddleware(BaseMiddleware):
     """Проверка является ли пользователь админом"""
-    def __init__(self, admins: List[str]):
-        self.admins = admins
+    def __init__(self, env_admins: List[str]):
+        db_admins = [admin.tg_id for admin in get_all_admins()]
+        self.admins = list(set(env_admins + db_admins))
 
     def is_admin(self, tg_id) -> bool:
-        if str(tg_id) not in config.ADMINS:
+        if str(tg_id) not in self.admins:
             return False
         return True
 

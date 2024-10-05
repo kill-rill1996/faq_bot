@@ -7,6 +7,30 @@ from database import tables
 from .database import Session
 
 
+def create_admin(tg_id: str) -> None:
+    """Добавление администратора"""
+    with Session() as session:
+        admin = tables.Admin(tg_id=tg_id)
+        session.add(admin)
+        session.commit()
+
+
+def get_admin_by_id(tg_id: str) -> tables.Admin:
+    """Получение админа по tg_id"""
+    with Session() as session:
+        admin = session.query(tables.Admin)\
+            .filter(tables.Admin.tg_id == tg_id)\
+            .first()
+        return admin
+
+
+def get_all_admins() -> List[tables.Admin]:
+    """Получение всех админов"""
+    with Session() as session:
+        admins = session.query(tables.Admin).all()
+        return admins
+
+
 def create_group(title: str) -> int:
     """Создание группы"""
     with Session() as session:
@@ -84,3 +108,4 @@ def get_question_by_id(question_id: int) -> tables.Question:
     with Session() as session:
         question = session.query(tables.Question).filter(tables.Question.id == question_id).first()
         return question
+

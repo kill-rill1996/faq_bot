@@ -4,6 +4,14 @@ from sqlalchemy.orm import relationship, backref
 from database.database import Base
 
 
+class Admin(Base):
+    __tablename__ = "admins"
+
+    id = Column(Integer, primary_key=True)
+    tg_id = Column(String, unique=True, index=True, nullable=False)
+
+
+
 class Group(Base):
     __tablename__ = 'groups'
 

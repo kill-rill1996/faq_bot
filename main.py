@@ -18,6 +18,7 @@ async def set_commands(bot: io.Bot):
         BotCommand(command="add_subgroup", description="Добавить подгруппу"),
         BotCommand(command="add_question", description="Добавить вопрос"),
         BotCommand(command="add_answer", description="Добавить ответ"),
+        BotCommand(command="add_admin", description="Добавить администратора"),
         BotCommand(command="help", description="Инструкция и поддержка"),
     ]
 
@@ -26,7 +27,7 @@ async def set_commands(bot: io.Bot):
 
 async def set_description(bot: io.Bot):
     """Описание бота до запуска"""
-    await bot.set_my_description("Бот поможет найти ответы на вопросы по бухгалтерии\n\nДля запуска бота нажмите /start)")
+    await bot.set_my_description("Бот поможет найти ответы на вопросы по бухгалтерии\n\nДля запуска бота нажмите /start")
 
 
 async def start_bot() -> None:
@@ -43,7 +44,7 @@ async def start_bot() -> None:
     #                   minute=0, second=0, start_date=datetime.now(), kwargs={"bot": bot})
     # scheduler.start()
 
-    dispatcher.include_routers(users.router, admin.router)
+    dispatcher.include_routers(admin.router, users.router)
 
     await dispatcher.start_polling(bot)
 

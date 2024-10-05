@@ -6,7 +6,7 @@ from aiogram.fsm.context import FSMContext
 
 from config import ADMINS
 from middleware import CheckIsAdminMiddleware
-from fsm_states import CreateGroupFSM, CreateSubGroupFSM, CreateQuestionFSM, CreateAnswerFSM
+from fsm_states import CreateGroupFSM, CreateSubGroupFSM, CreateQuestionFSM, CreateAnswerFSM, CreateAdminFSM
 import keyboards as kb
 import routers.utils as utils
 import database.services as db
@@ -16,8 +16,49 @@ router = Router()
 router.message.middleware.register(CheckIsAdminMiddleware(ADMINS))
 
 
+@router.message(Command("add_admin"))
+async def add_admin(message: types.Message, state: FSMContext) -> None:
+    """Добавление админа, начало FSM"""
+    await state.set_state(CreateAdminFSM.contact)
+    msg = await message.answer("Отправьте контакт нового администратора через вкладку 'Прикрепить'",
+                         reply_markup=kb.cancel_keyboard().as_markup())
+    await state.update_data(prev_mess=msg)
+
+
+@router.message(F.contact, CreateAdminFSM.contact)
+async def save_admin(message: types.Message, state: FSMContext) -> None:
+    """Сохранение админа, окончание FSM"""
+    contact = message.contact
+    tg_id = str(contact.user_id)
+
+    # если админ уже есть
+    if utils.is_admin_exists(tg_id):
+        data = await state.get_data()
+        try:
+            await data["prev_mess"].delete()
+        except TelegramBadRequest:
+            pass
+        msg = await message.answer("Пользователь уже является администратором, отправьте другой контакт",
+                                   reply_markup=kb.cancel_keyboard().as_markup())
+        await state.update_data(prev_mess=msg)
+        return
+
+    # новый админ
+    else:
+        db.create_admin(tg_id=str(contact.user_id))
+
+        data = await state.get_data()
+        try:
+            await data["prev_mess"].delete()
+        except TelegramBadRequest:
+            pass
+        await state.clear()
+
+        await message.answer("Новый администратор успешно добавлен!")
+
+
 # BLOCK OTHER TYPES
-@router.message(~F.content_type.in_({'text'}), StateFilter("*"))
+@router.message(~F.content_type.in_({'text', 'contact'}), StateFilter("*"))
 async def block_types_handler(message: types.Message) -> None:
     await message.answer("Некорректный тип данных в сообщении (принимается только текст)")
 
@@ -44,7 +85,7 @@ async def save_group(message: types.Message, state: FSMContext) -> None:
         db.create_group(group_title)
         data = await state.get_data()
         try:
-            data["prev_mess"].delete()
+            await data["prev_mess"].delete()
         except TelegramBadRequest:
             pass
         await state.clear()

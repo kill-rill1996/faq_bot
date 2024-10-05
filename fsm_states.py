@@ -34,3 +34,7 @@ class CreateAnswerFSM(StatesGroup):
     choose_subgroup = State()
     choose_answer = State()
     text = State()
+
+
+class CreateAdminFSM(StatesGroup):
+    contact = State()

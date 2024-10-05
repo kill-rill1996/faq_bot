@@ -26,3 +26,11 @@ def is_question_already_created(question_title: str, subgroup_id: int) -> bool:
         if question.title.lower() == question_title.lower():
             return True
     return False
+
+
+def is_admin_exists(tg_id: str) -> bool:
+    """Проверка на дублирование админа"""
+    admin = db.get_admin_by_id(tg_id)
+    if admin:
+        return True
+    return False

@@ -20,7 +20,8 @@ async def block_types_handler(message: types.Message) -> None:
 async def start_handler(message: types.Message) -> None:
     """Start message"""
     await message.answer("Бот поможет вам найти ответ на вопрос по интересующей вас теме.\n\n"
-                         "Для поиска ответа выберите команду\n/answers во вкладке \"Меню\" или нажмите на команду прямо в сообщении.")
+                         "Для поиска ответа выберите команду\n/answers во вкладке \"Меню\" или нажмите на команду прямо в сообщении.\n\n"
+                         "Для просмотра инструкции и обращения в поддержку выберите команду /help")
 
 
 @router.message(Command("help"))

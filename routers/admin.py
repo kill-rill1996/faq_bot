@@ -26,6 +26,20 @@ async def add_admin(message: types.Message, state: FSMContext) -> None:
     await state.update_data(prev_mess=msg)
 
 
+@router.message(~F.content_type.in_({'contact'}), CreateAdminFSM.contact)
+async def wrong_contact_data(message: types.Message, state: FSMContext) -> None:
+    """Если отправлена не карточка контакта"""
+    data = await state.get_data()
+    try:
+        await data["prev_mess"].delete()
+    except TelegramBadRequest:
+        pass
+
+    msg = await message.answer("Необходимо отправить <b>карточку контакта</b> через вкладку 'Прикрепить'",
+                               reply_markup=kb.cancel_keyboard().as_markup())
+    await state.update_data(prev_mess=msg)
+
+
 @router.message(F.contact, CreateAdminFSM.contact)
 async def save_admin(message: types.Message, state: FSMContext) -> None:
     """Сохранение админа, окончание FSM"""

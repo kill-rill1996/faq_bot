@@ -18,15 +18,22 @@ async def set_commands(bot: io.Bot):
         BotCommand(command="add_subgroup", description="Добавить подгруппу"),
         BotCommand(command="add_question", description="Добавить вопрос"),
         BotCommand(command="add_answer", description="Добавить ответ"),
+        BotCommand(command="help", description="Инструкция и поддержка"),
     ]
 
     await bot.set_my_commands(commands, BotCommandScopeDefault())
+
+
+async def set_description(bot: io.Bot):
+    """Описание бота до запуска"""
+    await bot.set_my_description("Бот поможет найти ответы на вопросы по бухгалтерии\n\nДля запуска бота нажмите /start)")
 
 
 async def start_bot() -> None:
     """Запуск бота"""
     bot = io.Bot(BOT_TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
     await set_commands(bot)
+    await set_description(bot)
 
     storage = MemoryStorage()
     dispatcher = io.Dispatcher(storage=storage)

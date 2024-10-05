@@ -23,6 +23,13 @@ async def start_handler(message: types.Message) -> None:
                          "Для поиска ответа выберите команду\n/answers во вкладке \"Меню\" или нажмите на команду прямо в сообщении.")
 
 
+@router.message(Command("help"))
+async def help_handler(message: types.Message) -> None:
+    """Help message"""
+    msg = ms.get_help_message()
+    await message.answer(msg)
+
+
 @router.message(Command("answers"))
 @router.callback_query(lambda callback: callback.data.split("_")[0] == "back" and callback.data.split("_")[1] == "to-group")
 async def start_handler(message: types.Message | types.CallbackQuery, state: FSMContext) -> None:

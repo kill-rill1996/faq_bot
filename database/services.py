@@ -1,7 +1,4 @@
-import datetime
 from typing import List
-from sqlalchemy.orm import joinedload
-from sqlalchemy import or_
 
 from database import tables
 from .database import Session

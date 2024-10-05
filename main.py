@@ -8,6 +8,8 @@ from aiogram.types import BotCommand, BotCommandScopeDefault
 from config import BOT_TOKEN
 from routers import admin, users
 from database import database
+from config import ADMINS
+from database.services import create_admin
 
 
 async def set_commands(bot: io.Bot):

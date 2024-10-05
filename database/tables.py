@@ -11,7 +11,6 @@ class Admin(Base):
     tg_id = Column(String, unique=True, index=True, nullable=False)
 
 
-
 class Group(Base):
     __tablename__ = 'groups'
 

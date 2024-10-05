@@ -2,13 +2,14 @@ from typing import Callable, Dict, Any, Awaitable, List
 
 from aiogram import BaseMiddleware
 from aiogram.types import TelegramObject
-import config
+from database import database as db
 from database.services import get_all_admins
 
 
 class CheckIsAdminMiddleware(BaseMiddleware):
     """Проверка является ли пользователь админом"""
     def __init__(self, env_admins: List[str]):
+        db.create_db()
         db_admins = [admin.tg_id for admin in get_all_admins()]
         self.admins = list(set(env_admins + db_admins))
 

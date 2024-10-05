@@ -1,4 +1,3 @@
-import aiogram
 from aiogram import Router, types, F
 from aiogram.exceptions import TelegramBadRequest
 from aiogram.filters import Command, StateFilter
@@ -13,7 +12,9 @@ import database.services as db
 import messages as ms
 
 router = Router()
-router.message.middleware.register(CheckIsAdminMiddleware(ADMINS))
+admin_middleware = CheckIsAdminMiddleware(ADMINS)
+router.message.middleware.register(admin_middleware)
+# router.message.middleware.register(CheckIsAdminMiddleware(ADMINS))
 
 
 @router.message(Command("add_admin"))
@@ -45,7 +46,8 @@ async def save_admin(message: types.Message, state: FSMContext) -> None:
 
     # новый админ
     else:
-        db.create_admin(tg_id=str(contact.user_id))
+        db.create_admin(tg_id=tg_id)
+        admin_middleware.admins += tg_id
 
         data = await state.get_data()
         try:

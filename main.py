@@ -22,7 +22,9 @@ async def set_commands(bot: io.Bot):
         BotCommand(command="add_subgroup", description="Добавить подгруппу"),
         BotCommand(command="add_question", description="Добавить вопрос"),
         BotCommand(command="add_answer", description="Добавить ответ"),
+        BotCommand(command="delete_answer", description="Удалить ответ"),
         BotCommand(command="add_admin", description="Добавить администратора"),
+        BotCommand(command="delete_admin", description="Удалить администратора"),
         BotCommand(command="help", description="Инструкция и поддержка"),
     ]
 

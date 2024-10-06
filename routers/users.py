@@ -33,6 +33,7 @@ async def help_handler(message: types.Message) -> None:
     await message.answer(msg)
 
 
+# CHOOSE ANSWER
 @router.message(Command("answers"))
 @router.callback_query(lambda callback: callback.data.split("_")[0] == "back" and callback.data.split("_")[1] == "to-group")
 async def start_handler(message: types.Message | types.CallbackQuery, state: FSMContext) -> None:
@@ -123,7 +124,7 @@ async def answer_handler(callback: types.CallbackQuery, state: FSMContext) -> No
 
     # если вопрос пустой без ответов
     if not answers:
-        await callback.message.edit_text("На данный вопросов ответов пока нет",
+        await callback.message.edit_text("На данный вопрос ответов пока нет",
                                          reply_markup=kb.back_to_question_keyboard().as_markup())
         return
 

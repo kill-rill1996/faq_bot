@@ -31,3 +31,16 @@ class CreateAnswerFSM(StatesGroup):
 
 class CreateAdminFSM(StatesGroup):
     contact = State()
+
+
+class DeleteAdminFSM(StatesGroup):
+    admin_id = State()
+    confirm = State()
+
+
+class DeleteAnswerFSM(StatesGroup):
+    group = State()
+    subgroup = State()
+    question = State()
+    answer = State()
+    confirm = State()

@@ -4,21 +4,57 @@ from database import tables
 from .database import Session
 
 
-def create_admin(tg_id: str) -> None:
+def create_admin(tg_id: str, phone: str) -> None:
     """Добавление администратора"""
     with Session() as session:
-        admin = tables.Admin(tg_id=tg_id)
+        admin = tables.Admin(tg_id=tg_id, phone=phone)
         session.add(admin)
         session.commit()
 
 
-def get_admin_by_id(tg_id: str) -> tables.Admin:
+def get_admin_by_tg_id(tg_id: str) -> tables.Admin:
     """Получение админа по tg_id"""
     with Session() as session:
         admin = session.query(tables.Admin)\
             .filter(tables.Admin.tg_id == tg_id)\
             .first()
         return admin
+
+
+def get_admin_by_id(id: int) -> tables.Admin:
+    """Получение админа из базы по id"""
+    with Session() as session:
+        admin = session.query(tables.Admin) \
+            .filter(tables.Admin.id == id) \
+            .first()
+        return admin
+
+
+def delete_admin_by_id(id: int) -> tables.Admin:
+    """Удаление админа по id"""
+    with Session() as session:
+        admin = session.query(tables.Admin).filter_by(id=id).first()
+        session.delete(admin)
+        session.commit()
+        return admin
+
+
+def delete_answer_by_id(id: int) -> tables.Answer:
+    """Удаление ответа по id"""
+    with Session() as session:
+        answer = session.query(tables.Answer).filter_by(id=id).first()
+        session.delete(answer)
+        session.commit()
+        return answer
+
+
+def get_answer_by_id(id: int) -> tables.Answer:
+    """Выбор ответа по id"""
+    with Session() as session:
+        answer = session.query(tables.Answer) \
+            .filter(tables.Answer.id == id) \
+            .first()
+        return answer
 
 
 def get_all_admins() -> List[tables.Admin]:

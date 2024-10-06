@@ -9,6 +9,7 @@ class Admin(Base):
 
     id = Column(Integer, primary_key=True)
     tg_id = Column(String, unique=True, index=True, nullable=False)
+    phone = Column(String)
 
 
 class Group(Base):
@@ -17,7 +18,7 @@ class Group(Base):
     id = Column(Integer, primary_key=True)
     title = Column(String, unique=True, index=True, nullable=False)
 
-    subgroups = relationship("SubGroup", back_populates="group", cascade="all,delete")
+    subgroups = relationship("SubGroup", back_populates="group")
 
     def __repr__(self):
         return f'{self.id}. {self.title}'
@@ -45,7 +46,7 @@ class Question(Base):
     title = Column(String, unique=True, index=True, nullable=False)
 
     subgroup_id = Column(Integer, ForeignKey('subgroups.id'))
-    subgroup = relationship("SubGroup", back_populates="questions", cascade="all,delete")
+    subgroup = relationship("SubGroup", back_populates="questions")
 
     answers = relationship("Answer", back_populates="question")
 
@@ -60,7 +61,7 @@ class Answer(Base):
     text = Column(Text, nullable=False)
 
     question_id = Column(Integer, ForeignKey('questions.id'))
-    question = relationship("Question", back_populates="answers", cascade="all,delete")
+    question = relationship("Question", back_populates="answers")
 
     def __repr__(self):
         return f'{self.id}. {self.question.title} {self.text}'

@@ -78,6 +78,11 @@ async def save_admin(message: types.Message, state: FSMContext) -> None:
 async def delete_admin(message: types.Message, state: FSMContext) -> None:
     """Удаление администратора из БД"""
     admins_from_db = db.get_all_admins()
+
+    if not admins_from_db:
+        await message.answer("У бота пока нет администраторов. \n\nИх можно добавить, используя команду /add_admin")
+        return
+
     await state.set_state(DeleteAdminFSM.admin_id)
     msg = await message.answer("Выберите номер администратора, которого хотите удалить:",
                          reply_markup=kb.all_admins_keyboard(admins_from_db).as_markup())
